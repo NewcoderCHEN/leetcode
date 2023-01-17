@@ -1,32 +1,34 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 using namespace std;
 
 class Solution {
     public:
         int largestRectangleArea(vector<int>& heights) {
-            int maxArea = 0;
-            int left, right;
-            int len = heights.size();
-            for (int i=0; i < len; i++) {
-                for (left = i-1; left >= 0; left--) {
-                    if (heights[left] < heights[i]) { break; }
+            heights.push_back(0);
+            int max_area = 0;
+            int left;
+            int right;
+            int height;
+            std::stack<int> up_node;
+            for (int i = 0; i < heights.size(); ++i) {
+                while (!up_node.empty() && heights[up_node.top()] >= heights[i]) {
+                    height= heights[up_node.top()];
+                    up_node.pop();
+                    left = up_node.empty() ? -1 : up_node.top();
+                    right = i;
+                    max_area = std::max(max_area, height * (right - left - 1));
                 }
-                left++;
-                for (right = i+1; right < len; right++) {
-                    if (heights[right] < heights[i]) { break; }
-                }
-                right--;
-                maxArea = max(maxArea, heights[i]*(right-left+1));
+                up_node.push(i);
             }
-            return maxArea;
+            return max_area;
         }
 };
 
 int main() {
-    vector<int> heights(100000,1);
+    vector<int> heights{2,1,5,6,2,3};
     Solution solu;
     cout << "the largest rectangle area determined by vector heights is " << endl << solu.largestRectangleArea(heights) << endl;
-
     return 0;
 }
